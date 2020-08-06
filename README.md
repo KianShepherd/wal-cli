@@ -1,5 +1,5 @@
 # wal-cli
-CLI for pywal to control the color backend and wallpaper for my arch setup
+CLI for pywal to control the color backend and wallpaper for my arch setup.
 
 ## Usage
 wal-cli: command list
