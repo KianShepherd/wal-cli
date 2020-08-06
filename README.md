@@ -21,7 +21,7 @@ Example file: config.ron
 (
     wallpaper_dir: "~/Pictures/wallpapers/",
     wallpaper: "wall6.jpg",
-    backend_dir: "~/.config/wal-rs/backends/",
+    backend_dir: "~/.config/wal-cli/backends/",
     backend: "colorz",
     post_script:"~/.config/wal/postwal.sh"
 )
