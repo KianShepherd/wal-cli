@@ -31,12 +31,12 @@ fn main() {
         )
         .arg(
             Arg::with_name("inc-backend")
-                .short("i")
+                .short("y")
                 .help("Changes to next backend."),
         )
         .arg(
             Arg::with_name("inc-wallpaper")
-                .short("y")
+                .short("t")
                 .help("Changes to next wallpaper."),
         )
         .get_matches();
@@ -51,9 +51,9 @@ fn main() {
             .value_of("wallpaper")
             .unwrap_or(&conf.get_wallpaper()),
     );
-    conf.set_wallpaper(wallpaper);
+    conf.set_wallpaper(wallpaper).unwrap();
     let backend = String::from(matches.value_of("backend").unwrap_or(&conf.get_backend()));
-    conf.set_backend(backend);
+    conf.set_backend(backend).unwrap();
 
     if matches.is_present("inc-wallpaper") {
         conf.next_wallpaper().unwrap();

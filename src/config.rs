@@ -10,10 +10,8 @@ use std::process::Command;
 pub struct Config {
     wallpaper_dir: String,
     wallpaper: String,
-    wallpapers: Vec<String>,
     backend_dir: String,
     backend: String,
-    backends: Vec<String>,
     post_script: String,
 }
 impl Config {
@@ -24,9 +22,8 @@ impl Config {
         file.read_to_string(&mut contents).unwrap();
         // println!("{}", contents);
         // println!("loading to struct");
-        let mut conf: Config = ron::from_str(&contents).unwrap();
+        let conf: Config = ron::from_str(&contents).unwrap();
         // println!("loading dirs");
-        conf.load_dirs()?;
         Ok(conf)
     }
 
@@ -45,25 +42,6 @@ impl Config {
         Ok(())
     }
 
-    fn load_dirs(&mut self) -> io::Result<()> {
-        let mut wallpapers = fs::read_dir(helpers::fix_home(&self.wallpaper_dir))?
-            .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
-            .collect::<Result<Vec<String>, io::Error>>()?;
-        wallpapers.sort();
-        // println!("{:?}", wallpapers);
-        self.wallpapers = wallpapers;
-
-        let mut backends = fs::read_dir(helpers::fix_home(&self.backend_dir))?
-            .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
-            .collect::<Result<Vec<String>, io::Error>>()?;
-        backends.sort();
-
-        // println!("{:?}", wallpapers);
-        self.backends = backends;
-
-        Ok(())
-    }
-
     pub fn get_wallpaper(&self) -> String {
         String::from(&self.wallpaper)
     }
@@ -73,26 +51,56 @@ impl Config {
     }
 
     pub fn next_wallpaper(&mut self) -> io::Result<()> {
-        let mut _idx = &self.wallpapers.binary_search(&self.wallpaper).unwrap();
-        let mut idx = *_idx;
-        idx = (idx + 1) % &self.wallpapers.len();
-        &self.set_wallpaper(String::from(&self.wallpapers[idx]));
+        let mut wallpapers = fs::read_dir(helpers::fix_home(&self.wallpaper_dir))?
+            .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
+            .collect::<Result<Vec<String>, io::Error>>()?;
+        wallpapers.sort();
+        let mut idx = wallpapers.binary_search(&self.wallpaper).unwrap();
+        idx = (idx + 1) % wallpapers.len();
+        &self.set_wallpaper(String::from(&wallpapers[idx]));
         Ok(())
     }
 
-    pub fn set_wallpaper(&mut self, wallpaper: String) {
-        self.wallpaper = wallpaper;
+    pub fn set_wallpaper(&mut self, wallpaper: String) -> io::Result<()> {
+        let mut wallpapers = fs::read_dir(helpers::fix_home(&self.wallpaper_dir))?
+            .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
+            .collect::<Result<Vec<String>, io::Error>>()?;
+        wallpapers.sort();
+        if wallpapers.contains(&wallpaper) {
+            self.wallpaper = wallpaper;
+            Ok(())
+        } else {
+            Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "wallpaper not found.",
+            ))
+        }
     }
 
-    pub fn set_backend(&mut self, backend: String) {
-        self.backend = backend;
+    pub fn set_backend(&mut self, backend: String) -> io::Result<()> {
+        let mut backends = fs::read_dir(helpers::fix_home(&self.backend_dir))?
+            .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
+            .collect::<Result<Vec<String>, io::Error>>()?;
+        backends.sort();
+        if backends.contains(&backend) {
+            self.backend = backend;
+            Ok(())
+        } else {
+            Err(io::Error::new(
+                io::ErrorKind::NotFound,
+                "backend not found.",
+            ))
+        }
     }
 
     pub fn next_backend(&mut self) -> io::Result<()> {
-        let mut _idx = &self.backends.binary_search(&self.backend).unwrap();
-        let mut idx = *_idx;
-        idx = (idx + 1) % &self.backends.len();
-        &self.set_backend(String::from(&self.backends[idx]));
+        let mut backends = fs::read_dir(helpers::fix_home(&self.backend_dir))?
+            .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
+            .collect::<Result<Vec<String>, io::Error>>()?;
+        backends.sort();
+        let mut idx = backends.binary_search(&self.backend).unwrap();
+        idx = (idx + 1) % backends.len();
+        &self.set_backend(String::from(&backends[idx]));
         Ok(())
     }
 
