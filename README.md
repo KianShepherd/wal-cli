@@ -32,3 +32,6 @@ backend_dir:
     -> wal
     -> colorthiefs
 ```
+
+## Scripts
+Also in this repository are 2 scripts for use with rofi to switch wallpaper and backend, the scripts are modified versions of the themeswitch script by [ilsenatorov](https://github.com/ilsenatorov/dotfiles).
