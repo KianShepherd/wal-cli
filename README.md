@@ -13,7 +13,7 @@ wal-cli: command list
 
 ## Config File
 Format is [Rusty Object Notation](https://docs.rs/ron)  
-Default location is ~/.config/wal-rs/config.ron  
+Default location is ~/.config/wal-cli/config.ron  
 Backends dir is just a directory with typeless files named for each color backend installed, to be set up manually.  
 
 Example file: config.ron

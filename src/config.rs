@@ -16,14 +16,11 @@ pub struct Config {
 }
 impl Config {
     pub fn from_file(path: &str) -> io::Result<Config> {
-        // println!("reading file");
         let mut file = File::open(helpers::fix_home(path)).unwrap();
         let mut contents = String::new();
         file.read_to_string(&mut contents).unwrap();
-        // println!("{}", contents);
-        // println!("loading to struct");
         let conf: Config = ron::from_str(&contents).unwrap();
-        // println!("loading dirs");
+
         Ok(conf)
     }
 
@@ -35,7 +32,6 @@ impl Config {
             .create(true)
             .open(helpers::fix_home(path))
             .unwrap();
-        // println!("\nUPDATE:\n{:?}\n", string);
         file.seek(SeekFrom::Start(0)).unwrap();
         file.write_all((&string).as_bytes()).unwrap();
 
@@ -58,6 +54,7 @@ impl Config {
         let mut idx = wallpapers.binary_search(&self.wallpaper).unwrap();
         idx = (idx + 1) % wallpapers.len();
         &self.set_wallpaper(String::from(&wallpapers[idx]));
+
         Ok(())
     }
 
@@ -66,8 +63,10 @@ impl Config {
             .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
             .collect::<Result<Vec<String>, io::Error>>()?;
         wallpapers.sort();
+
         if wallpapers.contains(&wallpaper) {
             self.wallpaper = wallpaper;
+
             Ok(())
         } else {
             Err(io::Error::new(
@@ -82,8 +81,10 @@ impl Config {
             .map(|res| res.map(|e| String::from(e.path().file_name().unwrap().to_str().unwrap())))
             .collect::<Result<Vec<String>, io::Error>>()?;
         backends.sort();
+
         if backends.contains(&backend) {
             self.backend = backend;
+
             Ok(())
         } else {
             Err(io::Error::new(
@@ -101,20 +102,20 @@ impl Config {
         let mut idx = backends.binary_search(&self.backend).unwrap();
         idx = (idx + 1) % backends.len();
         &self.set_backend(String::from(&backends[idx]));
+
         Ok(())
     }
 
     pub fn call(&self) {
         let wall = String::from(&self.wallpaper_dir) + &self.wallpaper;
-
-        let retval = format!(
+        let command = format!(
             "wal -i {} --backend {} -o {}",
             wall, &self.backend, &self.post_script
         );
-        println!("{}", retval);
+        println!("{}", command);
         Command::new("sh")
             .arg("-c")
-            .arg(retval)
+            .arg(command)
             .output()
             .expect("Failed to run wal command");
     }

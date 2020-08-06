@@ -43,7 +43,7 @@ fn main() {
 
     let config_path = matches
         .value_of("config")
-        .unwrap_or("~/.config/wal-rs/config.ron");
+        .unwrap_or("~/.config/wal-cli/config.ron");
     let mut conf = config::Config::from_file(config_path).unwrap();
 
     let wallpaper = String::from(
